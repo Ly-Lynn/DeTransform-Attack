@@ -66,7 +66,7 @@ if __name__ == "__main__":
     os.makedirs(args.output_dir, exist_ok=True)
     success_rate = 0
     image_files = [f for f in os.listdir(args.data_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
-    for image_file in tqdm(image_files[:2], desc="Processing images"):
+    for image_file in tqdm(image_files, desc="Processing images"):
         image_path = os.path.join(args.data_dir, image_file)
         image = Image.open(image_path).convert("RGB")
         x = transform(image).unsqueeze(0).to(MODEL.device)
