@@ -50,7 +50,7 @@ if __name__ == "__main__":
             "epsilon": args.epsilon,
             "num_steps": args.num_steps,
         }
-    txt_output = os.path.join(args.output_dir, "results.txt")
+    txt_output = os.path.join(args.output_dir, f"{args.attack_type}_results.txt")
 
     MODEL = Model(args.model)
     model = MODEL.get_model()
