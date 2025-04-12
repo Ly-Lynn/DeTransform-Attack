@@ -65,6 +65,7 @@ if __name__ == "__main__":
 
     os.makedirs(args.output_dir, exist_ok=True)
     success_rate = 0
+    flag = False
     image_files = [f for f in os.listdir(args.data_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
     for image_file in tqdm(image_files, desc="Processing images"):
         image_path = os.path.join(args.data_dir, image_file)
@@ -80,7 +81,10 @@ if __name__ == "__main__":
         adv_score = torch.max(adv_inference, 1)[0].item()
         if predicted != adv_predicted:
             success_rate += 1
-        adv_path = os.path.join(args.output_dir, f"{args.attack_type}_{image_file}")
+            flag = True
+        else: flag = False
+        adv_path = os.path.join(args.output_dir, args.attack_type, f"{flag}_{image_file}")
+        os.makedirs(os.path.dirname(adv_path), exist_ok=True)
         save_image(adv_image, adv_path)
 
         with open(txt_output, "a") as f:
