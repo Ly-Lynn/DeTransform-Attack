@@ -11,3 +11,9 @@ def save_image(image: torch.Tensor, path: str):
     
     image = Image.fromarray(image.numpy().astype("uint8")).convert("RGB")
     image.save(path)
+
+def de_normalize(image: torch.Tensor, mean:list, std:list) -> torch.Tensor:
+    mean = torch.tensor(mean, device=image.device, dtype=image.dtype)
+    std = torch.tensor(std, device=image.device, dtype=image.dtype)
+    image = image * std[:, None, None] + mean[:, None, None]
+    return torch.clamp(image, 0, 1)

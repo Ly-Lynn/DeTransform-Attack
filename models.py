@@ -24,6 +24,12 @@ class Model:
         return self.model
     def get_class_name(self):
         return self.class_name
+    def inference(self, x):
+        with torch.no_grad():
+            output = self.model(x)
+            score, predicted = torch.max(output, 1)
+            predicted, score = predicted.item(), score.item()
+        return output, predicted, score
 
 if __name__ == "__main__":
     MODEL = Model("efficientnet_v2_m")
