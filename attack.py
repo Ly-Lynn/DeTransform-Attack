@@ -27,35 +27,37 @@ class WhiteAttack:
         x, y = self.convert_xy(x, y)
         x.requires_grad = True
         output = self.model(x)
-        loss = F.cross_entropy(output, y)
         self.model.zero_grad()
+        loss = F.cross_entropy(output, y)
         loss.backward()
         x_grad = x.grad.data
         x_adv = x + epsilon * x_grad.sign()
         return x_adv.detach()
     def pgd(self, x, y, epsilon=0.1, alpha=0.01, num_steps=10):
         x, y = self.convert_xy(x, y)
+        x_adv = x.clone().detach()
         for _ in range(num_steps):
-            x.requires_grad = True
-            output = self.model(x)
-            loss = F.cross_entropy(output, y)
+            x_adv.requires_grad = True
+            output = self.model(x_adv)
             self.model.zero_grad()
+            loss = F.cross_entropy(output, y)
             loss.backward()
-            x_grad = x.grad.data
-            x_adv = x + alpha * x_grad.sign()
+            x_grad = x_adv.grad.data
+            x_adv = x_adv + alpha * x_grad.sign()
             x_adv = torch.clamp(x_adv, 0, 1)
-            x_adv = torch.min(torch.max(x_adv, x - epsilon), x + epsilon)
+            x_adv = torch.clamp(x_adv, x - epsilon, x + epsilon)
         return x_adv.detach()
     def ddn(self, x, y, epsilon=0.1, num_steps=10):
         x, y = self.convert_xy(x, y)
+        x_adv = x.clone().detach()
         for _ in range(num_steps):
-            x.requires_grad = True
-            output = self.model(x)
-            loss = F.cross_entropy(output, y)
+            x_adv.requires_grad = True
+            output = self.model(x_adv)
             self.model.zero_grad()
+            loss = F.cross_entropy(output, y)
             loss.backward()
-            x_grad = x.grad.data
-            x_adv = x + epsilon * x_grad.sign()
+            x_grad = x_adv.grad.data
+            x_adv = x_adv + epsilon * x_grad.sign()
             x_adv = torch.clamp(x_adv, 0, 1)
         return x_adv.detach()
     def attack(self, **kwargs):
